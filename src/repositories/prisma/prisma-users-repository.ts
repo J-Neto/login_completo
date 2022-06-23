@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-import { findUserWithExistentEmail, UserCreate, UserFind, UsersRepository } from "../interfaces/users-repository";
+import { findUserWithExistentEmail, SendToken, UpdatePassword, UserCreate, UserFind, UsersRepository } from "../interfaces/users-repository";
 
 export class PrismaUsersRepository implements UsersRepository {
 
@@ -36,6 +36,33 @@ export class PrismaUsersRepository implements UsersRepository {
       }
     );
     return User;
+  }
+
+  async sendToken({ id, token, expiresIn}: SendToken) {
+    await prisma.user.update(
+      {
+        where: {
+          id
+        },
+        data: {
+          passwordResetToken: token,
+          passwordResetExpires: expiresIn
+        }
+      }
+    );
+  }
+
+  async updatePassword({ id, password }: UpdatePassword) {
+    await prisma.user.update(
+      {
+        where: {
+          id
+        },
+        data: {
+          password,
+        }
+      }
+    )
   }
 
 }
